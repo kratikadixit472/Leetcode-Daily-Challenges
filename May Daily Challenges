@@ -1,0 +1,283 @@
+Day 1 ====>>>>   Prefix and Suffix Search
+
+class WordFilter {
+
+    HashMap<String, Integer> wordFilter;
+    
+    public WordFilter(String[] words) {
+        
+        wordFilter = new HashMap<>();
+        int idx = 0;
+        for(String word: words){
+            ArrayList<String> plist = new ArrayList<>();
+            ArrayList<String> slist = new ArrayList<>();
+            for(int i=0; i<word.length(); i++){
+                plist.add(word.substring(0, word.length()-i));
+                slist.add(word.substring(word.length()-i));
+            }
+            slist.add(word);
+            for(String pr : plist){
+                for(String sf : slist){
+                   wordFilter.put(pr + " " + sf, idx);
+                }
+            }
+            idx++;
+        }
+    }
+    
+    public int f(String prefix, String suffix) {
+    
+        return wordFilter.getOrDefault(prefix+" "+suffix, 0);
+        
+    }
+}
+
+
+
+Day 3 ====>>>>   Running Sum of 1d Array
+
+class Solution {
+    public int[] runningSum(int[] nums) {
+        
+        int n = nums.length;
+        int[] res = new int[n];
+        int sum = 0, i = 0;
+        
+        for(int ele : nums){
+            sum += ele;
+            res[i++] = sum;
+        }
+        
+        return res;
+    }
+}
+
+
+Day 4 ====>>>>   Non-decreasing Array
+
+class Solution {
+    public boolean checkPossibility(int[] nums) {
+        
+        int n = nums.length, count = 0;
+        
+        for(int i=1; i<n; i++){
+            if(nums[i] < nums[i-1]){
+                count++;
+                
+                if(count > 1 || (i-1 > 0 && i+1 < n && nums[i+1] < nums[i-1] && nums[i] < nums[i-2])){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+
+
+Day 5 ====>>>> Jump Game II
+
+class Solution {
+    public int jump(int[] nums) {
+        
+        int jump = 0;
+        int maxReach = 0, currReach = 0;
+        
+        for(int i=0; i<nums.length-1; i++){
+            
+            maxReach = Math.max(maxReach, i+nums[i]);
+            if(i == currReach){
+                jump++;
+                currReach = maxReach;
+            }
+            
+        }
+        return jump;
+    }
+}
+
+
+Day 6 ====>>>>   Convert Sorted List to Binary Search Tree
+
+class Solution {
+    public TreeNode sortedListToBST(ListNode head) {
+        
+        
+        return convert(head, null);
+    }
+    
+    private TreeNode convert(ListNode head, ListNode tail){
+        if(head == tail){
+            return null;
+        }
+        ListNode mid = middle(head, tail);
+        ListNode midNext = mid.next;
+        
+        TreeNode node = new TreeNode(mid.val);
+        node.left = convert(head, mid);
+        node.right = convert(midNext, tail);
+        
+        return node;
+    }
+    
+    private ListNode middle(ListNode node, ListNode tail){
+        ListNode slow = node, fast = node;
+        
+        while(fast != tail && fast.next != tail){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+    private int length(ListNode node){
+        if(node == null ){
+            return 0;
+        }
+        int len = 0;
+        while(node != null){
+            node = node.next;
+            len++;
+        }
+        return len;
+    }
+}
+
+
+Day 7 ====>>>>     Delete Operation for Two Strings
+
+class Solution {
+    public int minDistance(String word1, String word2) {
+        
+        int[][] dp = new int[word1.length()+1][word2.length()+1];
+        
+        for(int i=0; i<=word1.length(); i++){
+            for(int j=0; j<=word2.length(); j++){
+                
+                if(i == 0 || j == 0){
+                    continue;
+                }
+                
+                if(word1.charAt(i-1) == word2.charAt(j-1)){
+                    dp[i][j] = 1 + dp[i-1][j-1];
+                }
+                else{
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+            }
+        }
+        
+        return word1.length()+word2.length() - 2 * dp[word1.length()][word2.length()];
+    }
+}
+
+
+Day 8 ====>>>>    Super Palindromes
+
+class Solution {
+    public int superpalindromesInRange(String start, String end) {
+        
+        long leftNo = Long.parseLong(start);
+        long rightNo = Long.parseLong(end);
+        
+        int result = 0;
+        
+        List<Long> pali = new ArrayList<>();
+        
+        for(long i=0; i<10; i++){
+            pali.add(i);
+        }
+        
+        for(int i=1; i<10000; i++){
+            String left = Long.toString(i);
+            String right = new StringBuilder(left).reverse().toString();
+            
+            pali.add(Long.parseLong(left+right));
+            
+            for(int d=0; d<10; d++){
+                pali.add(Long.parseLong(left+d+right));
+            }
+        }
+        
+        for(long pal : pali){
+            long squre = pal* pal;
+            if(leftNo <= squre && squre <= rightNo && isPalindrome(squre)){
+                result++;
+            }
+        }
+        return result;
+        
+    }
+    private boolean isPalindrome(long num){
+        long rev = 0;
+        long n = num;
+        
+        while(n > 0){
+            rev = rev * 10 + n % 10;
+             n = n / 10;
+        }
+       
+        
+        if(num == rev){
+            return true;
+        }
+        return false;
+    }
+}
+
+
+Day 9 ====>>>>     Construct Target Array With Multiple Sums
+
+//Recursive Solution-1 ====>>>> 1 ms
+
+class Solution {
+    public boolean isPossible(int[] target) {
+        
+        int index = 0;
+        int sum = target[index];
+        
+        for(int i=1; i<target.length; i++){
+            if(target[i] > target[index]){
+                index = i;
+            }
+            sum += target[i];
+        }
+        
+        if(target[index] == 1) return true;
+        
+        sum -= target[index];
+        if(target[index] <= sum || sum <= 0) return false;
+        target[index] %= sum;
+        sum += target[index];
+        
+        return isPossible(target);
+    }
+}
+
+// Max Heap Solution - 2   ===>>>> 7ms
+
+class Solution {
+    public boolean isPossible(int[] target) {
+        
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> b-a);
+        
+        int sum = 0;
+        
+        for(int ele : target){
+            pq.add(ele);
+            sum += ele;
+        }
+        
+        while(pq.peek() != 1){
+            int num = pq.poll();
+            sum -= num;
+            if(num <= sum || sum < 1) return false;
+            
+            num %= sum;
+            pq.add(num);
+            sum += num;
+        }
+        return true;
+    }
+}
+
+
+Day 10 ====>>>>
